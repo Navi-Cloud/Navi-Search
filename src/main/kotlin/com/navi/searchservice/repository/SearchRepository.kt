@@ -11,8 +11,11 @@ import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.findOne
+import org.springframework.data.mongodb.core.insert
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.core.updateFirst
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.stereotype.Repository
 
@@ -33,6 +36,33 @@ class SearchRepository(
             )
         )
         return mongoTemplate.findOne(query) ?: searchOverStorage(issuer, searchKeyword)
+    }
+
+    fun keywordExists(issuer: String, searchKeyword: String): Boolean {
+        val query = Query().addCriteria(
+            Criteria().andOperator(
+                Criteria.where(SearchModel::searchKeyword.name).`is`(searchKeyword),
+                Criteria.where(SearchModel::issuer.name).`is`(issuer)
+            )
+        )
+
+        return mongoTemplate.findOne<SearchModel>(query) != null
+    }
+
+    fun addNewSearchableIndex(searchModel: SearchModel) {
+        mongoTemplate.insert<SearchModel>(searchModel)
+    }
+
+    fun updateSearchIndex(issuer: String, searchKeyword: String, fileObject: FileObject) {
+        val query = Query().addCriteria(
+            Criteria().andOperator(
+                Criteria.where(SearchModel::searchKeyword.name).`is`(searchKeyword),
+                Criteria.where(SearchModel::issuer.name).`is`(issuer)
+            )
+        )
+        val update = Update().push(SearchModel::searchResult.name, fileObject)
+
+        mongoTemplate.updateFirst<SearchModel>(query, update)
     }
 
     private fun searchOverStorage(issuer: String, searchKeyword: String): SearchModel {

@@ -9,8 +9,7 @@ import com.navi.searchservice.model.FileObject
 import com.navi.searchservice.model.SearchModel
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -116,6 +115,71 @@ class SearchRepositoryTest {
         searchRepository.searchRepository(testFileObject.userEmail, "test").also {
             assertNotNull(it)
             assertEquals(0, it.searchResult.size)
+        }
+    }
+
+    @DisplayName("keywordExists: keywordExists should return true if keyword exists")
+    @Test
+    fun is_keywordExists_returns_true_if_exists() {
+        // Let
+        val mockSearchResult = SearchModel(
+            issuer = "kangdroid",
+            searchKeyword = "test",
+            searchResult = listOf(testFileObject)
+        )
+
+        mongoTemplate.insert(mockSearchResult)
+
+        // Do
+        searchRepository.keywordExists(mockSearchResult.issuer, mockSearchResult.searchKeyword).also {
+            assertTrue(it)
+        }
+    }
+
+    @DisplayName("keywordExists: keywordExists should return false if keyword not exists")
+    @Test
+    fun is_keywordExists_returns_false_if_not_exists() {
+        // Do
+        searchRepository.keywordExists("mockSearchResult.issuer", "mockSearchResult.searchKeyword").also {
+            assertFalse(it)
+        }
+    }
+
+    @DisplayName("addNewSearchableIndex: addNewSearchableIndex should insert index model well.")
+    @Test
+    fun is_addSearchableIndex_works_well() {
+        // Let
+        val mockSearchResult = SearchModel(
+            issuer = "kangdroid",
+            searchKeyword = "test",
+            searchResult = listOf(testFileObject)
+        )
+        searchRepository.addNewSearchableIndex(mockSearchResult)
+
+        // do
+        searchRepository.searchRepository(mockSearchResult.issuer, mockSearchResult.searchKeyword).also {
+            assertEquals(mockSearchResult.issuer, it.issuer)
+        }
+    }
+
+    @DisplayName("updateSearchIndex: updateSearchIndex should add fileObject to index well.")
+    @Test
+    fun is_updateSearchIndex_works_well() {
+        // Let
+        val mockSearchResult = SearchModel(
+            issuer = "kangdroid",
+            searchKeyword = "test",
+            searchResult = listOf()
+        )
+        searchRepository.addNewSearchableIndex(mockSearchResult)
+
+        // do
+        searchRepository.updateSearchIndex("kangdroid", "test", testFileObject)
+
+        // check
+        searchRepository.searchRepository(mockSearchResult.issuer, mockSearchResult.searchKeyword).also {
+            assertEquals(mockSearchResult.issuer, it.issuer)
+            assertEquals(1, it.searchResult.size)
         }
     }
 }

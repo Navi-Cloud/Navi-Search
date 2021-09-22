@@ -75,6 +75,8 @@ dependencies {
 	testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
+	testImplementation ("com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0") //Mockito-Kotlin
+	testImplementation ("org.mockito:mockito-inline:2.21.0")
 }
 
 tasks.withType<KotlinCompile> {
