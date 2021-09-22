@@ -34,32 +34,6 @@ jobs:
         run: docker-compose -f mongo-compose.yml down
 
   # This workflow contains a single job called "build"
-  TestOnMacOS:
-    # The type of runner that the job will run on
-    runs-on: macos-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      # Setup Docker container for mongoDB
-      - name: Setup MongoDB Runner
-        run: docker-compose -f mongo-compose.yml up -d
-
-      # Build it from source
-      - name: Build Source
-        run: ./gradlew clean build
-
-      # Test it!
-      - name: Test
-        run: ./gradlew clean test
-
-      # Destroy MongoDB
-      - name: Destroy Docker-Compose MongoDB
-        run: docker-compose -f mongo-compose.yml down
-
-  # This workflow contains a single job called "build"
   TestOnWindows:
     # The type of runner that the job will run on
     runs-on: windows-latest
