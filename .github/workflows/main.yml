@@ -58,3 +58,24 @@ jobs:
       # Destroy MongoDB
       - name: Destroy Docker-Compose MongoDB
         run: docker-compose -f mongo-compose.yml down
+
+  # This workflow contains a single job called "build"
+  ReleaseAzureCR:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Wait for those job
+    needs: TestOnUbuntu
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Release to KDR CR
+      - name: Deploy to Container Registry
+        run: |
+          docker login ${{secrets.CONTAINER_REGISTRY}} --username ${{secrets.DOCKER_USERNAME}} --password ${{secrets.DOCKER_USERPASSWORD}}
+          docker build -t navi_search:latest .
+          docker tag navi_search:latest ${{secrets.CONTAINER_REGISTRY}}/navi_search:latest
+          docker push ${{secrets.CONTAINER_REGISTRY}}/navi_search:latest
