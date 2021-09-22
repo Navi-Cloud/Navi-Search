@@ -67,6 +67,12 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.springframework.kafka:spring-kafka")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.0")
+	implementation("com.fasterxml.jackson.core:jackson-core:2.12.0")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.12.0")
+	implementation("com.fasterxml.jackson.core:jackson-annotations:2.12.0")
+
+	testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
 }
